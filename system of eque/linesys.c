@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #define size 4  /*dimension of matrix*/
-
+#define econs  0.0001
 //here is global data
 	//time
 		clock_t starttime;
@@ -141,24 +141,42 @@ void getmyanswerviamethoditerations(int p){//f is an answer like in lapack
 	gsl_blas_dgemm_(CblasNoTrans, CblasNoTrans,1.0, &blasE_ATt.matrix, &blasxp.matrix,0.0, &blassum.matrix);
 	*/
 //end of itt method
-
+float findnormavector(float a[]){
+	int i;
+	float sum=0.0;
+	for(i=0;i<size;i++){
+		sum=sum+a[i];
+		}
+	return sum;
+}
+void lapackwork(){
+	//lapack is working here
+		c1=size;
+		c2=1;
+	starttime=clock();
+	sgesv_(&c1, &c2, AT, &c1, pivot, f, &c1, &ok);
+	endtime=clock();
+	//lapack have done it
+	printf("Answer of working lapack\n");
+	myprintf(2);
+	printf("Lapack time:=%d\n",endtime-starttime);
+	printf("********************************\n");
+	printf("\n");
+	
+	}
 int main(){
 	makematrixA();
 	printmatrixA();
 	mymakef();
 	myprintf(1);
-
-	//lapack is working here
-		c1=size;
-		c2=1;
-	
-	sgesv_(&c1, &c2, AT, &c1, pivot, f, &c1, &ok);
-	//lapack have done it
-	printf("Answer of working lapack\n");
-	myprintf(2);
+	lapackwork();
+	starttime=clock();
 	getmyanswerviamethoditerations(100);
+	endtime=clock();
 	printf("Answer of working it method (3)\n");
 	myprintf(2);
+	printf("It method m=100 time:=%d\n",endtime-starttime);
+	printf("********************************\n");
 	
 return 0;
 }

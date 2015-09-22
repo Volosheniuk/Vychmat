@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1442308891 source:/home/volosheniuk/programs/hey/vuchmat/proizvodn/main.cpp
+	<iostream>
+	"gnuplot.h"
+	<cmath>
+	<fstream>
+	<iomanip>
+
+1442304704 /home/volosheniuk/programs/hey/vuchmat/proizvodn/gnuplot.h
+	<cstdio>
+	<string>
+	<iostream>
+

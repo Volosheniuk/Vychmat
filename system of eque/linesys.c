@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <time.h>
+#include <math.h>
 #define size 4  /*dimension of matrix*/
 #define econs  0.0001
 //here is global data
@@ -83,10 +84,10 @@ void myprintf(int q){
 //ittt method
 void getmyanswerviamethoditerations(int p){//f is an answer like in lapack
 	int i,j;
-	double xp[size];
-	double xp1[size];
-	double sum;
-	double t=1;
+	float xp[size];
+	float xp1[size];
+	float sum;
+	float t=0.5;
 	//f=tttttt  xp=11111111
 	for(i=0;i<size;i++){
 		f[i]=t;
@@ -145,17 +146,18 @@ float findnormavector(float a[]){
 		}
 	return sum;
 }
-float findnormamatrixA(){
+float findnormamatrixA(float matrix[]){
 	int i,j;
 	float sum=0;
-	float ans=0;
+	float ans=-65000.0;
 	for (i=0;i<size;i++){
-		ans=ans+AT[i];
+		ans=ans+matrix[i];
 		}
 	for(i=1;i<size;i++){
 		sum=0;
 		for(j=0;j<size;j++){
-			sum=sum+AT[i*size+j];
+			sum=sum+matrix[i*size+j];
+			
 			}
 		if(sum>ans) ans=sum;  
 		}
@@ -170,12 +172,61 @@ void lapackwork(){
 	endtime=clock();
 		
 }
-void itmethodwork(){
+void itmethodwork(int p){
 	starttime=clock();
-	getmyanswerviamethoditerations(100);
+	getmyanswerviamethoditerations(p);
 	endtime=clock();		
 }
-
+int findm(){
+	int res=0;
+	float x0[size];
+	float x1[size];
+	int i,j;
+	for (i=0;i<size;i++){
+		x0[i]=1;
+		}
+	//get E-tA
+	for (i=0;i<size;i++){
+		for(j=0;j<size;j++){
+			if(i==j){
+					E_At[i][j]=1-0.5*A[i][j];
+					}
+			else E_At[i][j]=-0.5*A[i][j];
+			}
+		}
+	for (i=0; i<size; i++){
+		for(j=0; j<size; j++) E_ATt[i*size+j]=E_At[j][i];		
+	}
+	float q;
+	for(i=0;i<size;i++){
+		for(j=0;j<size;j++){
+			printf("%f   ",E_ATt[i*size+j]);
+			}
+			printf("\n");
+		}
+	 if(findnormamatrixA(E_ATt)>=0) q=findnormamatrixA(E_ATt);
+	 else q=(-1.0)*findnormamatrixA(E_ATt);
+	if (q==0) printf("Erorrr\n");
+	printf("q%f\n",q);
+	//lets find ||x1-x0||
+	float sum=0;
+	for (i=0;i<size;i++){
+			for(j=0;j<size;j++){
+				sum=sum+E_At[i][j]*x0[j];
+				}
+			x1[i]=sum+f[i];
+			sum=0;
+			}
+	for(i=0;i<size;i++){
+		x1[i]=x1[i]-x0[i];
+		}
+	float qq;
+	if(findnormavector(x1)>=0) qq=findnormavector(x1);
+	else qq=(-1.0)*findnormavector(x1);
+	printf("qq%f\n",qq);
+	res=log(econs*(1-q)/qq)/log(q);
+	return res;
+	}
 int main(){
 	makematrixA();
 	mymakef();
@@ -204,12 +255,19 @@ int main(){
 						break;
 					}
 			case 4: {
-						itmethodwork();
+						itmethodwork(100);
 						printf("Answer of working it method (3)\n");
 						myprintf(2);
 						printf("It method m=100 time:=%d\n",endtime-starttime);
 						printf("********************************\n");
 						break;
+					}
+			case 5: {
+						printf("OPtimal m=%d\n",findm());
+						break;
+					}
+			case 6: {
+
 					}
 			}
 		}

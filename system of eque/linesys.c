@@ -27,7 +27,6 @@ void endtimer(){
 unsigned long returntime(){
 	return endtime-starttime;	
 }
-
 void makematrixA(){
 	int i,j;
 	//A=)=0
@@ -59,14 +58,12 @@ void printmatrixA(){
  printf("********************************");
  printf("\n");
 }
-
 void mymakef(){
 		int i;
 		for(i=0;i<size;i++){
 				f[i]=1;
 		}
 }
-
 void myprintf(int q){
 	int i;
 	switch (q){
@@ -84,7 +81,6 @@ void myprintf(int q){
  printf("\n");
 }
 //ittt method
-
 void getmyanswerviamethoditerations(int p){//f is an answer like in lapack
 	int i,j;
 	double xp[size];
@@ -149,6 +145,22 @@ float findnormavector(float a[]){
 		}
 	return sum;
 }
+float findnormamatrixA(){
+	int i,j;
+	float sum=0;
+	float ans=0;
+	for (i=0;i<size;i++){
+		ans=ans+AT[i];
+		}
+	for(i=1;i<size;i++){
+		sum=0;
+		for(j=0;j<size;j++){
+			sum=sum+AT[i*size+j];
+			}
+		if(sum>ans) ans=sum;  
+		}
+	return ans;
+	}
 void lapackwork(){
 	//lapack is working here
 		c1=size;
@@ -156,27 +168,54 @@ void lapackwork(){
 	starttime=clock();
 	sgesv_(&c1, &c2, AT, &c1, pivot, f, &c1, &ok);
 	endtime=clock();
-	//lapack have done it
-	printf("Answer of working lapack\n");
-	myprintf(2);
-	printf("Lapack time:=%d\n",endtime-starttime);
-	printf("********************************\n");
-	printf("\n");
-	
-	}
-int main(){
-	makematrixA();
-	printmatrixA();
-	mymakef();
-	myprintf(1);
-	lapackwork();
+		
+}
+void itmethodwork(){
 	starttime=clock();
 	getmyanswerviamethoditerations(100);
-	endtime=clock();
-	printf("Answer of working it method (3)\n");
-	myprintf(2);
-	printf("It method m=100 time:=%d\n",endtime-starttime);
-	printf("********************************\n");
+	endtime=clock();		
+}
+
+int main(){
+	makematrixA();
+	mymakef();
+	int command=1000;
+	while (command!=0){
+		printf("Your command:");
+		scanf("%d",&command);
+		switch (command){
+			case 1: {
+						printmatrixA();
+						break;
+					}
+			case 2: {
+						mymakef();
+						myprintf(1);
+						break;
+					}
+			case 3: {
+						lapackwork();
+						//lapack have done it
+						printf("Answer of working lapack\n");
+						myprintf(2);
+						printf("Lapack time:=%d\n",endtime-starttime);
+						printf("********************************\n");
+						printf("\n");
+						break;
+					}
+			case 4: {
+						itmethodwork();
+						printf("Answer of working it method (3)\n");
+						myprintf(2);
+						printf("It method m=100 time:=%d\n",endtime-starttime);
+						printf("********************************\n");
+						break;
+					}
+			}
+		}
+		
+	
+	
 	
 return 0;
 }

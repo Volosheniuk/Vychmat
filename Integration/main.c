@@ -5,10 +5,19 @@
 #include <time.h>
 
 /*list of functions
-	0-- sin(x)
+	0-- sin(x)  from 0 to pi/2   
+	1-- x(10x+1)(10x+2) from 0 to 1  step 0.1   0.02
+	2--ln(x)  from 0.01 to 1 
+	3--exp(4x)sin(40px)  from 0 to 1
+	4--xabs(x)  from -1 to 2  step 0.1  0.05 0.02 1/4 1/8 1/16 1/32 
+	5--(1+x^(3/2))ln(x)  from 0 to 1 step  0.1  0.05 0.02 1/4 1/8 1/16 1/32
+	* 
 */
 //method 0 -rect, 1-trapeze, 2-Simson 
-int getN_by_e(int method,float e,float a,float b,float M){
+
+//func= f(x)
+
+int getN_by_e(int method,double e,double a,double b,double M){
 	int N;
 	switch (method){
 		case 0: {
@@ -34,9 +43,9 @@ int getN_by_e(int method,float e,float a,float b,float M){
 	}
 
 
-float rectangleform(int N,float a,float b,int func){
-float h;
-float rez=0;
+float rectangleform(int N,double a,double b,int func){
+double h;
+double rez=0;
 h=(b-a)/N;
 int i;
 switch (func){
@@ -69,7 +78,7 @@ return rez*h;
 }
 
 
-float trapezeform(int N,float a,float b,int func){
+float trapezeform(int N,double a,double b,double func){
 float h;
 float rez=0;
 h=(b-a)/N;
@@ -103,9 +112,9 @@ switch (func){
 return rez*h/2.0;	
 	}
 
-float Simpson(int N,float a,float b,int func){
-float h;
-float rez=0;
+float Simpson(int N,double a,double b,int func){
+double h;
+double rez=0;
 h=(b-a)/N;
 int i;
 switch (func){
@@ -138,9 +147,9 @@ return rez*h/6.0;
 
 }
 
-float findoptimalh(int method,float e,float a,float b,int func){
- float preJ,J;int n=2;
- float flag=3*e;
+float findoptimalh(int method,double e,float a,float b,int func){
+ double preJ,J;int n=2;
+ double flag=3*e;
 	switch (method){
 			case 0: {
 						preJ=rectangleform(1,a,b,func);
@@ -181,7 +190,7 @@ float findoptimalh(int method,float e,float a,float b,int func){
 }
 
 
-float timeofwork(int method,int N,float a,float b,int func){
+float timeofwork(int method,int N,double a,double b,double func){
 	clock_t t1,t2;
 	switch (method){
 		case 0: {
@@ -209,7 +218,7 @@ float timeofwork(int method,int N,float a,float b,int func){
 	return ;
 	}
 
-void builddata_J_h(int method,float e,float a,float b,float M,int func){
+void builddata_J_h(int method,double e,double a,double b,double M,int func){
 int Nopt=2*getN_by_e(method,e,a,b,M);
 		switch (method){
 			case 0:{
@@ -221,8 +230,9 @@ int Nopt=2*getN_by_e(method,e,a,b,M);
 			}
 		}
 }
+
 int main(){
-	float ans=timeofwork(0,100000,0,1.57,0);
+	double ans=timeofwork(0,100000,0,1.57,0);
 	printf("%f",ans);
 return 0;
 }

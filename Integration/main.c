@@ -3,16 +3,52 @@
 //#include <gnuplot.h>
 #include <math.h>
 #include <time.h>
+//#include <gsl/gsl_integration.h>
+#define mypi     3.14159265358979323846
 
 /*list of functions
 	0-- sin(x)  from 0 to pi/2   
 	1-- x(10x+1)(10x+2) from 0 to 1  step 0.1   0.02
 	2--ln(x)  from 0.01 to 1 
 	3--exp(4x)sin(40px)  from 0 to 1
-	4--xabs(x)  from -1 to 2  step 0.1  0.05 0.02 1/4 1/8 1/16 1/32 
-	5--(1+x^(3/2))ln(x)  from 0 to 1 step  0.1  0.05 0.02 1/4 1/8 1/16 1/32
 	* 
 */
+//global data 
+int counter;
+
+
+
+void my_handler (const char * reason,const char * file,int line,int gsl_errno){
+   printf("Error: %s at %s:%d\n",reason,file,line);
+};
+
+void zerocounter(){
+	counter=0;
+	}
+	
+	
+double f(double x, void * params) {
+  counter++;
+  return sin(x);
+};
+
+double f1(double x, void * params) {
+  counter++;
+  return x*(10*x+1)*(10*x+2);
+};
+
+double f2(double x, void * params) {
+  counter++;
+  return ln(x);
+};
+double f3(double x, void * params) {
+  counter++;
+  return exp(4*x)*sin(40*mypi*x);
+};
+
+
+
+
 //method 0 -rect, 1-trapeze, 2-Simson 
 
 //func= f(x)
@@ -43,7 +79,7 @@ int getN_by_e(int method,double e,double a,double b,double M){
 	}
 
 
-float rectangleform(int N,double a,double b,int func){
+double rectangleform(int N,double a,double b,int func){
 double h;
 double rez=0;
 h=(b-a)/N;
@@ -78,7 +114,7 @@ return rez*h;
 }
 
 
-float trapezeform(int N,double a,double b,double func){
+double trapezeform(int N,double a,double b,double func){
 float h;
 float rez=0;
 h=(b-a)/N;
@@ -112,7 +148,7 @@ switch (func){
 return rez*h/2.0;	
 	}
 
-float Simpson(int N,double a,double b,int func){
+double Simpson(int N,double a,double b,int func){
 double h;
 double rez=0;
 h=(b-a)/N;
@@ -147,7 +183,7 @@ return rez*h/6.0;
 
 }
 
-float findoptimalh(int method,double e,float a,float b,int func){
+double findoptimalh(int method,double e,float a,float b,int func){
  double preJ,J;int n=2;
  double flag=3*e;
 	switch (method){
@@ -190,7 +226,7 @@ float findoptimalh(int method,double e,float a,float b,int func){
 }
 
 
-float timeofwork(int method,int N,double a,double b,double func){
+double timeofwork(int method,int N,double a,double b,double func){
 	clock_t t1,t2;
 	switch (method){
 		case 0: {
@@ -215,7 +251,7 @@ float timeofwork(int method,int N,double a,double b,double func){
 					return -1;
 		}	
 	}
-	return ;
+	return -1;
 	}
 
 void builddata_J_h(int method,double e,double a,double b,double M,int func){
@@ -231,7 +267,33 @@ int Nopt=2*getN_by_e(method,e,a,b,M);
 		}
 }
 
+
 int main(){
+	printf("Results:\n");
+	printf("For integral sin(x) from 0 to pi/2  we have next:\n");
+	double hrectangleform=findoptimalh(0,0.00001,0,mypi/2.0,0);
+	int step =(int)(mypi/(2*hrectangleform));
+	printf("OPtimal h for rectangelmethod (e=0.00001) is %le \n",hrectangleform);
+	printf("Using it we have: I=%le",rectangleform(step,0,mypi/2,0));
+	int number=0;
+	printf("Number of callings f(x) is= %d",number);
+	builddata_J_h(0,0.00001,0,mypi/2.0);
+	printf("Dependence between |I-In|(h) is plotted in the pictire: Pic1\n");
+	gsl_function FS;
+    gsl_integration_workspace * WS;
+	int i,j;
+    double res,err;
+    size_t neval;
+    gsl_set_error_handler (my_handler);
+    FS.function=f;
+    counter=0;
+    for(j=1;j<512;j*=2) {
+      i=gsl_integration_qng(&FS, 0.0,(j+1)*M_PI,1.0e-8,1.0e-8, &res,&err,&neval);
+      printf("%d: %le %le %ld %d\n",j,res,err,neval,counter);
+   counter=0;
+
+   };
+	
 	double ans=timeofwork(0,100000,0,1.57,0);
 	printf("%f",ans);
 return 0;

@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-//#include <gnuplot.h>
+#include "gp.h"
 #include <math.h>
 #include <time.h>
+#include <string.h>
+
+
 //#include <gsl/gsl_integration.h>
 #define mypi     3.14159265358979323846
-
 /*list of functions
 	0-- sin(x)  from 0 to pi/2   
 	1-- x(10x+1)(10x+2) from 0 to 1  step 0.1   0.02
@@ -15,9 +17,10 @@
 */
 //global data 
 int counter;
+int filenameN=0;// to count plotting files
 
 
-
+/*
 void my_handler (const char * reason,const char * file,int line,int gsl_errno){
    printf("Error: %s at %s:%d\n",reason,file,line);
 };
@@ -47,7 +50,7 @@ double f3(double x, void * params) {
 };
 
 
-
+*/
 
 //method 0 -rect, 1-trapeze, 2-Simson 
 
@@ -114,7 +117,7 @@ return rez*h;
 }
 
 
-double trapezeform(int N,double a,double b,double func){
+double trapezeform(int N,double a,double b,int func){
 float h;
 float rez=0;
 h=(b-a)/N;
@@ -222,7 +225,7 @@ double findoptimalh(int method,double e,float a,float b,int func){
 	
 	
  	
-	
+	return -1;
 }
 
 
@@ -254,32 +257,81 @@ double timeofwork(int method,int N,double a,double b,double func){
 	return -1;
 	}
 
-void builddata_J_h(int method,double e,double a,double b,double M,int func){
+//function for creating  names of files
+
+ void reverse(char s[]){
+     int i, j;
+     char c;
+ 
+     for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
+         c = s[i];
+         s[i] = s[j];
+         s[j] = c;
+     }
+ }
+ void itoa(int n, char s[]){
+     int i, sign;
+ 
+     if ((sign = n) < 0)  /* записываем знак */
+         n = -n;          /* делаем n положительным числом */
+     i = 0;
+     do {       /* генерируем цифры в обратном порядке */
+         s[i++] = n % 10 + '0';   /* берем следующую цифру */
+     } while ((n /= 10) > 0);     /* удаляем */
+     if (sign < 0)
+         s[i++] = '-';
+     s[i] = '\0';
+     reverse(s);
+ }
+
+void builddata_J_h(int method,double e,double a,double b,double M){
 int Nopt=2*getN_by_e(method,e,a,b,M);
+int i;
+double h,ans;
+char path[20];
+	itoa(filenameN,path);
+FILE *myfile=fopen(path,"w");
 		switch (method){
 			case 0:{
+					for(i=1;i<Nopt;i++){
+						h=(b-a)/((double)i);
+						ans=rectangleform(i,a,b,0);
+						fprintf(myfile,"%lf   %lf\n",ans,h);
 						
+						}
+					
+					break;	
 			}
 			default: {
 					printf("error\n");
 					break;
 			}
 		}
+	filenameN++;
+	fclose(myfile);
 }
 
 
 int main(){
+	Gnuplot gp;
 	printf("Results:\n");
 	printf("For integral sin(x) from 0 to pi/2  we have next:\n");
 	double hrectangleform=findoptimalh(0,0.00001,0,mypi/2.0,0);
 	int step =(int)(mypi/(2*hrectangleform));
-	printf("OPtimal h for rectangelmethod (e=0.00001) is %le \n",hrectangleform);
-	printf("Using it we have: I=%le",rectangleform(step,0,mypi/2,0));
+	printf("OPtimal h for rectangelmethod (e=0.00001) is %lf \n",hrectangleform);
+	printf("Using it we have: I=%lf\n",rectangleform(step,0,mypi/2,0));
 	int number=0;
-	printf("Number of callings f(x) is= %d",number);
-	builddata_J_h(0,0.00001,0,mypi/2.0);
+	printf("Number of callings f(x) is= %d\n",number);
+	builddata_J_h(0,0.00001,0,mypi/2.0,1);
+	gp("plot '' using 1:2\n");
 	printf("Dependence between |I-In|(h) is plotted in the pictire: Pic1\n");
-	gsl_function FS;
+	
+	/*int n = 100500;
+	char s[10];
+	itoa(n,s);
+	printf("%s",s);*/
+	
+/*	gsl_function FS;
     gsl_integration_workspace * WS;
 	int i,j;
     double res,err;
@@ -293,6 +345,7 @@ int main(){
    counter=0;
 
    };
+	*/
 	
 	double ans=timeofwork(0,100000,0,1.57,0);
 	printf("%f",ans);

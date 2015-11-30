@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "gp.h"
 #include <math.h>
 #include <time.h>
 #include <string.h>
@@ -272,12 +271,12 @@ double timeofwork(int method,int N,double a,double b,double func){
  void itoa(int n, char s[]){
      int i, sign;
  
-     if ((sign = n) < 0)  /* записываем знак */
-         n = -n;          /* делаем n положительным числом */
+     if ((sign = n) < 0) 
+         n = -n; 
      i = 0;
-     do {       /* генерируем цифры в обратном порядке */
-         s[i++] = n % 10 + '0';   /* берем следующую цифру */
-     } while ((n /= 10) > 0);     /* удаляем */
+     do {       
+         s[i++] = n % 10 + '0';   
+     } while ((n /= 10) > 0);     
      if (sign < 0)
          s[i++] = '-';
      s[i] = '\0';
@@ -301,7 +300,23 @@ FILE *myfile=fopen(path,"w");
 						}
 					
 					break;	
-			}
+				}
+			case 1:{
+					for(i=1;i<Nopt;i++){
+						h=(b-a)/((double)i);
+						ans=trapezeform(i,a,b,0);
+						fprintf(myfile,"%lf   %lf\n",ans,h);
+						}
+					break;
+				}
+			case 2:{
+					for(i=1;i<Nopt;i++){
+						h=(b-a)/((double)i);
+						ans=Simpson(i,a,b,0);
+						fprintf(myfile,"%lf   %lf\n",ans,h);
+						}
+					break;
+				}
 			default: {
 					printf("error\n");
 					break;
@@ -313,9 +328,11 @@ FILE *myfile=fopen(path,"w");
 
 
 int main(){
-	Gnuplot gp;
+	
+    FILE *gp = popen("gnuplot -persist","w");
 	printf("Results:\n");
 	printf("For integral sin(x) from 0 to pi/2  we have next:\n");
+	printf("Rectangle method\n");
 	double hrectangleform=findoptimalh(0,0.00001,0,mypi/2.0,0);
 	int step =(int)(mypi/(2*hrectangleform));
 	printf("OPtimal h for rectangelmethod (e=0.00001) is %lf \n",hrectangleform);
@@ -323,9 +340,37 @@ int main(){
 	int number=0;
 	printf("Number of callings f(x) is= %d\n",number);
 	builddata_J_h(0,0.00001,0,mypi/2.0,1);
-	gp("plot '' using 1:2\n");
+	fprintf(gp, "set terminal jpeg\n");
+	fprintf(gp, "set output 'rectangle method.jpg' \n");
+	fprintf(gp, "set title \"Dependence between |I-In|(h) for rectangle method\" \n");
+	fprintf(gp, "plot '0' using 1:2 with lines \n");
 	printf("Dependence between |I-In|(h) is plotted in the pictire: Pic1\n");
-	
+	printf("\n");
+	printf("Trapez method\n");
+	double htrapezform=findoptimalh(1,0.00001,0,mypi/2.0,0);
+	step =(int)(mypi/(2*hrectangleform));
+	printf("OPtimal h for trapezmethod (e=0.00001) is %lf \n",htrapezform);
+	printf("Using it we have: I=%lf\n",trapezeform(step,0,mypi/2,0));
+	number=0;
+	printf("Number of callings f(x) is= %d\n",number);
+	builddata_J_h(1,0.00001,0,mypi/2.0,1);
+	fprintf(gp, "set title \"Dependence between |I-In|(h) for trapeze method\" \n");
+	fprintf(gp, "plot '1' using 1:2 with lines \n");
+	printf("Dependence between |I-In|(h) is plotted in the pictire: Pic1\n");
+	printf("\n");
+	printf("Simpson method\n");
+	double hsimpsonform=findoptimalh(2,0.00001,0,mypi/2.0,0);
+	step =(int)(mypi/(2*hsimpsonform));
+	printf("OPtimal h for simpsonmethod (e=0.00001) is %lf \n",hsimpsonform);
+	printf("Using it we have: I=%lf\n",Simpson(step,0,mypi/2,0));
+	number=0;
+	printf("Number of callings f(x) is= %d\n",number);
+	builddata_J_h(2,0.00001,0,mypi/2.0,1);
+	fprintf(gp, "set title \"Dependence between |I-In|(h) for Simpson method\" \n");
+	fprintf(gp, "plot '2' using 1:2 with lines \n");
+	printf("Dependence between |I-In|(h) is plotted in the pictire: Pic1\n");
+	printf("\n");
+	pclose(gp);
 	/*int n = 100500;
 	char s[10];
 	itoa(n,s);

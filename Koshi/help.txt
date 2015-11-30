@@ -1,0 +1,12 @@
+In  EulerAdamsRunge.py i wrote first part of our problem
+for
+	u'+ Au =0
+	A=-3
+	u(0)=b
+
+In EulerAdamsRunge2.py i wrote second part of our problem
+for 
+	u'=98u+198v
+	v'=-99u-199v
+	u(0)=1
+	v(0)=1

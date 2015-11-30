@@ -95,19 +95,19 @@ switch (func){
 	}
 	case 1: {
 		for(i=0;i<N;i++){
-			//rez=func(a+h*i+h/2);
+			rez=rez+(a+h*i+h/2)*(10*(a+h*i+h/2)+1)*(10*(a+h*i+h/2)+2);
 		}
 		break;
 	}
 	case 2:{
 		for(i=0;i<N;i++){
-			//rez=func(a+h*i+h/2);
+			rez=rez+log(a+h*i+h/2);
 		}
 		break;
 	}
 	case 3: {
 		for(i=0;i<N;i++){
-			//rez=func(a+h*i+h/2);
+			rez=rez+exp(4*(a+h*i+h/2))*sin(40*mypi*(a+h*i+h/2));
 		}
 		break;
 	}
@@ -130,19 +130,19 @@ switch (func){
 	}
 	case 1: {
 		for(i=0;i<N;i++){
-			//rez=rez+func(a+h*i)+func(a+h*(i+1));
+			rez=rez+(a+h*i)*(10*(a+h*i)+1)*(10*(a+h*i)+2)+(a+h*(i+1))*(10*(a+h*(i+1))+1)*(10*(a+h*(i+1))+2);
 		}
 		break;
 	}
 	case 2:{
 		for(i=0;i<N;i++){
-			//rez=rez+func(a+h*i)+func(a+h*(i+1));
+			rez=rez+log(a+h*i)+log(a+h*(i+1));
 		}
 		break;
 	}
 	case 3: {
 		for(i=0;i<N;i++){
-			//rez=rez+func(a+h*i)+func(a+h*(i+1));
+			rez=rez+exp(a+h*i)*sin(40*mypi*(a+h*i))+exp(a+h*(i+1))*sin(40*mypi*(a+h*(i+1)));
 		}
 		break;
 	}
@@ -164,19 +164,19 @@ switch (func){
 	}
 	case 1: {
 		for(i=0;i<N;i++){
-			//rez=rez+func(a+h*i)+func(a+h*(i+1));
+			rez=rez+(a+h*i)*(10*(a+h*i)+1)*(10*(a+h*i)+2)+4*(a+h*(i+1/2.0))*(10*(a+h*(i+1/2.0))+1)*(10*(a+h*(i+1/2.0))+2)+(a+h*(i+1))*(10*(a+h*(i+1))+1)*(10*(a+h*(i+1))+2);
 		}
 		break;
 	}
 	case 2:{
 		for(i=0;i<N;i++){
-			//rez=rez+func(a+h*i)+func(a+h*(i+1));
+			rez=rez+log(a+h*i)+4*log(a+h*(i+1/2.0))+log(a+h*(i+1));
 		}
 		break;
 	}
 	case 3: {
 		for(i=0;i<N;i++){
-			//rez=rez+func(a+h*i)+func(a+h*(i+1));
+			rez=rez+exp(4*(a+h*i))*sin(40*mypi*(a+h*i))+4*exp(4*(a+h*(i+1/2.0)))*sin(40*mypi*(a+h*(i+1/2.0)))+exp(4*(a+h*(i+1)))*sin(40*mypi*(a+h*(i+1)));
 		}
 		break;
 	}
@@ -354,6 +354,8 @@ int main(){
 	number=0;
 	printf("Number of callings f(x) is= %d\n",number);
 	builddata_J_h(1,0.00001,0,mypi/2.0,1);
+	fprintf(gp, "set terminal jpeg\n");
+	fprintf(gp, "set output 'trapeze method.jpg' \n");
 	fprintf(gp, "set title \"Dependence between |I-In|(h) for trapeze method\" \n");
 	fprintf(gp, "plot '1' using 1:2 with lines \n");
 	printf("Dependence between |I-In|(h) is plotted in the pictire: Pic1\n");
@@ -366,6 +368,8 @@ int main(){
 	number=0;
 	printf("Number of callings f(x) is= %d\n",number);
 	builddata_J_h(2,0.00001,0,mypi/2.0,1);
+	fprintf(gp, "set terminal jpeg\n");
+	fprintf(gp, "set output 'Simpson method.jpg' \n");
 	fprintf(gp, "set title \"Dependence between |I-In|(h) for Simpson method\" \n");
 	fprintf(gp, "plot '2' using 1:2 with lines \n");
 	printf("Dependence between |I-In|(h) is plotted in the pictire: Pic1\n");

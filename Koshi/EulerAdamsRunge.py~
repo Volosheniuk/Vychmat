@@ -19,6 +19,7 @@ f2 = open("runge.txt","w")
 f3 = open("adams.txt","w")
 
 for j in range(1,18):
+    print(j)
     a = 0
     b = 2
     y0 = 1

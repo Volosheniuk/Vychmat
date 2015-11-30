@@ -1,0 +1,3 @@
+Working programm is mnk.py !!!
+(not necessary for lab)mnk.cpp is a part with lapack
+

@@ -1,0 +1,6 @@
+Attention the program time is very big!!!
+This part of lab was written in python, so i didn't use  PLAIN, MISER & VEGAS.
+in montekarlo.py  1 problem "the volume of the n-sphere" was founded for n=20. (if you want to find something else, you just should change n)
+2 problem   The integral of the n-dimensional Gaussian.  was founded for n=20. (if you want to find something else, you just should change n)
+3problem 1, but with the punctured area of small diameter.  diam=0.01  was founded for n=20. (if you want to find something else, you just should change n)
+

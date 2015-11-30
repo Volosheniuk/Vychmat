@@ -26,11 +26,6 @@ for i in range (0,1000000):
     a[0] = xk[0] = uk[0]
     a[1] = xk[1] = uk[1]
 
-   # for j in range (0,10000):
-   #     xk1[0] = a[0] + tau * fx(xk[0], xk[1])
-   #     xk1[1] = a[1] + tau * fx(xk[0], xk[1])
-   #     xk[0] = xk1[0]
-   #     xk[1] = xk1[1]
 
     while z>p:
        # print(k)
@@ -47,5 +42,6 @@ for i in range (0,1000000):
     uk[1] = xk[1]
 
 f1.close()
+print("Answer x, y:")
 print(uk)
 

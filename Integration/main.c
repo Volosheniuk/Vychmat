@@ -3,9 +3,7 @@
 #include <math.h>
 #include <time.h>
 #include <string.h>
-
-
-//#include <gsl/gsl_integration.h>
+#include <gsl/gsl_integration.h>
 #define mypi     3.14159265358979323846
 /*list of functions
 	0-- sin(x)  from 0 to pi/2   
@@ -19,7 +17,7 @@ int counter;
 int filenameN=0;// to count plotting files
 
 
-/*
+
 void my_handler (const char * reason,const char * file,int line,int gsl_errno){
    printf("Error: %s at %s:%d\n",reason,file,line);
 };
@@ -41,7 +39,7 @@ double f1(double x, void * params) {
 
 double f2(double x, void * params) {
   counter++;
-  return ln(x);
+  return log(x);
 };
 double f3(double x, void * params) {
   counter++;
@@ -49,7 +47,6 @@ double f3(double x, void * params) {
 };
 
 
-*/
 
 //method 0 -rect, 1-trapeze, 2-Simson 
 
@@ -337,7 +334,7 @@ int main(){
 	int step =(int)(mypi/(2*hrectangleform));
 	printf("OPtimal h for rectangelmethod (e=0.00001) is %lf \n",hrectangleform);
 	printf("Using it we have: I=%lf\n",rectangleform(step,0,mypi/2,0));
-	int number=(int)((mypi/2.0-1)/step);
+	int number=(int)((mypi/2.0-1)/hrectangleform);
 	printf("Number of callings f(x) is= %d\n",number);
 	builddata_J_h(0,0.00001,0,mypi/2.0,1,1.0);
 	fprintf(gp, "set terminal jpeg\n");
@@ -348,10 +345,10 @@ int main(){
 	printf("\n");
 	printf("Trapez method\n");
 	double htrapezform=findoptimalh(1,0.00001,0,mypi/2.0,0);
-	step =(int)(mypi/(2*hrectangleform));
+	step =(int)(mypi/(2*htrapezform));
 	printf("OPtimal h for trapezmethod (e=0.00001) is %lf \n",htrapezform);
 	printf("Using it we have: I=%lf\n",trapezeform(step,0,mypi/2,0));
-	number=2*(int)((mypi/2.0-1)/step);
+	number=2*(int)((mypi/2.0-1)/htrapezform);
 	printf("Number of callings f(x) is= %d\n",number);
 	builddata_J_h(1,0.00001,0,mypi/2.0,1,1.0);
 	fprintf(gp, "set terminal jpeg\n");
@@ -365,7 +362,7 @@ int main(){
 	step =(int)(mypi/(2*hsimpsonform));
 	printf("OPtimal h for simpsonmethod (e=0.00001) is %lf \n",hsimpsonform);
 	printf("Using it we have: I=%lf\n",Simpson(step,0,mypi/2,0));
-	number=3*(int)((mypi/2.0-1)/step);
+	number=3*(int)(2*(mypi/2.0-1)/hsimpsonform);
 	printf("Number of callings f(x) is= %d\n",number);
 	builddata_J_h(2,0.00001,0,mypi/2.0,1,1.0);
 	fprintf(gp, "set terminal jpeg\n");
@@ -375,28 +372,38 @@ int main(){
 	printf("Dependence between |I-In|(h) is plotted in the pictire: simmeth.jpg\n");
 	printf("\n");
 	pclose(gp);
-	/*int n = 100500;
-	char s[10];
-	itoa(n,s);
-	printf("%s",s);*/
 	
-/*	gsl_function FS;
+	
+	gsl_function FS;
     gsl_integration_workspace * WS;
-	int i,j;
     double res,err;
     size_t neval;
     gsl_set_error_handler (my_handler);
     FS.function=f;
     counter=0;
-    for(j=1;j<512;j*=2) {
-      i=gsl_integration_qng(&FS, 0.0,(j+1)*M_PI,1.0e-8,1.0e-8, &res,&err,&neval);
-      printf("%d: %le %le %ld %d\n",j,res,err,neval,counter);
-   counter=0;
-
-   };
-	*/
+    gsl_integration_qng(&FS, 0.0,mypi/2,1.0e-5,1.0e-5, &res,&err,&neval);
+    printf("QNG answer= %lf   err= %lf    ",res,err);
+    printf("Number of callings f(x) is= %d\n",(int)neval);
+    counter=0;
+	WS=gsl_integration_workspace_alloc(1000);
+    gsl_integration_qag(&FS, 0.0, mypi/2, 1.0e-5, 1.0e-5, 1000, GSL_INTEG_GAUSS15 , WS, &res, &err);
+    printf("QAG answer=  %lf\n",res);
+    printf("Number of callings f(x) is= %d\n",counter);
+	gsl_integration_workspace_free(WS);
+	counter=0;
+	WS=gsl_integration_workspace_alloc(1000);
+	gsl_integration_qags(&FS, 0.0, mypi/2, 1.0e-5, 1.0e-5, 1000, WS, &res, &err);
+	printf("QAGS answer=  %lf\n",res);
+    printf("Number of callings f(x) is= %d\n",counter);
+	gsl_integration_workspace_free(WS);
+	counter=0;
+	gsl_integration_cquad_workspace  *WC;
+	WC=gsl_integration_cquad_workspace_alloc(1000);
+	gsl_integration_cquad (&FS,0.0,mypi/2, 1.0e-5, 1.0e-5,WC, &res, &err,&neval);
+	printf("CQUAD answer=  %lf\n",res);
+    printf("Number of callings f(x) is= %d\n",(int)neval);
+	gsl_integration_cquad_workspace_free(WC);
 	
-	double ans=timeofwork(0,100000,0,1.57,0);
-	printf("%f",ans);
+	
 return 0;
 }

@@ -1,0 +1,69 @@
+#include <iostream>
+#include "gnuplot.h"
+#include <fstream>
+#include <stdio.h>
+#include<fstream>
+#include<iomanip>
+#include <cstdlib>
+using namespace std;
+
+//define zone
+#define kapa 0.9
+#define ul 1.0
+#define ur 0
+#define damp 20
+
+int main(){
+	Gnuplot gp;
+	double *u;
+	double *u1;
+	int m,i,j;
+	cout<<"Write m, please!"<<endl;
+	cin>>m;
+	double h=1.0/(double)m;
+	cout<<"h="<<h<<endl;
+	double myytime=h*h/2.0/kapa;
+	//double myytime=0.25;
+	cout<<"t"<<myytime<<endl;
+	u=(double*)malloc(m*sizeof(double));
+	u1=(double*)malloc(m*sizeof(double));
+  //at the beg
+	for(i=0;i<m/2;i++){
+		u[i]=1;
+		u1[i]=1;
+	}
+	for(i=m/2;i<m;i++){
+		u[i]=0;
+		u1[i]=0;
+	}
+ //main part
+ ofstream answer("data.txt");
+ 	for(j=0;j<damp;j++){
+		for(i=0;i<m;i++){
+			if(i==0){
+				u1[0]=u[0]+kapa*myytime/h/h*(u[1]+ul-2*u[0]);
+			}
+			else if(i==(m-1)){
+				u1[m-1]=u[m-1]+kapa*myytime/h/h*(ur+u[m-2]-2*u[m-1]);
+			}else{
+				u1[i]=u[i]+kapa*myytime/h/h*(u[i+1]+u[i-1]-2*u[i]);
+			}			
+		}
+	//swap
+	     for(i=0;i<m;i++){
+			u[i]=u1[i];	
+		}
+	//write after step
+	
+	  for(i=0;i<m;i++){
+		answer<<i<<"  "<<u[i]<<endl;
+	}
+	answer<<endl<<endl;
+	
+	   
+	
+	}	
+answer.close();
+	gp("plot 'data.txt' using 1:2 \n");
+return 0;
+}

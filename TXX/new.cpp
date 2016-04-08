@@ -5,12 +5,13 @@
 #include<fstream>
 #include<iomanip>
 #include <cstdlib>
+#include <math.h>
 using namespace std;
 
 //define zone
 #define kapa 0.9
-#define ul 1.0
-#define ur 0
+#define ul 0.0
+#define ur 0.0
 #define damp 20
 
 int main(){
@@ -18,26 +19,22 @@ int main(){
 	double *u;
 	double *u1;
 	int m,i,j;
-	cout<<"Write m, please!"<<endl;
-	cin>>m;
+	ofstream answer("data.txt");
+for(int k=0; k<1000; k++){
+	m=k;
 	double h=1.0/(double)m;
-	cout<<"h="<<h<<endl;
+	
 	double myytime=h*h/2.0/kapa;
-	//double myytime=0.25;
-	cout<<"t"<<myytime<<endl;
+	
 	u=(double*)malloc(m*sizeof(double));
 	u1=(double*)malloc(m*sizeof(double));
   //at the beg
-	for(i=0;i<m/2;i++){
-		u[i]=1;
-		u1[i]=1;
-	}
-	for(i=m/2;i<m;i++){
-		u[i]=0;
-		u1[i]=0;
+	for(i=0;i<m;i++){
+		u[i]=sin(i*3.14/m);
+		u1[i]=sin(i*3.14/m);
 	}
  //main part
- ofstream answer("data.txt");
+ 
  	for(j=0;j<damp;j++){
 		for(i=0;i<m;i++){
 			if(i==0){
@@ -55,15 +52,18 @@ int main(){
 		}
 	//write after step
 	
-	  for(i=0;i<m;i++){
-		answer<<i<<"  "<<u[i]<<endl;
-	}
-	answer<<endl<<endl;
-	
-	   
-	
 	}	
-answer.close();
+	for(j=0;j<m;j++){
+		u1[j]=u[j]-exp(-kapa*damp)*sin(i*3.14/m);
+		}
+	double ans=0;
+	for(j=0;j<m;j++){
+		ans=ans+u1[j];
+		}
+	answer<<h<<"   "<<sqrt(ans)<<endl;
+	
+	
+	}
 	gp("plot 'data.txt' using 1:2 \n");
 return 0;
 }
